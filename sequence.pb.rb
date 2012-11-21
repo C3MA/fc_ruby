@@ -21,7 +21,7 @@
 # }
 # 
 # message BinaryFrame {
-#   repeated RGB_Value pixel = 1;
+#   repeatedRGB_Value pixel = 1;
 # }
 # 
 # message BinarySequence {
@@ -118,7 +118,7 @@ module Fullcircle
     required :string, :generator_name, 4
     required :string, :generator_version, 5
   end
-  class RGB_Value < ::Protobuf::Message
+  class RGBValue < ::Protobuf::Message
     defined_in __FILE__
     required :uint32, :red, 1
     required :uint32, :green, 2
@@ -128,7 +128,7 @@ module Fullcircle
   end
   class BinaryFrame < ::Protobuf::Message
     defined_in __FILE__
-    repeated :RGB_Value, :pixel, 1
+    repeated :RGBValue, :pixel, 1
   end
   class BinarySequence < ::Protobuf::Message
     defined_in __FILE__

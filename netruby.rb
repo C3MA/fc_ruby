@@ -8,19 +8,9 @@ require 'socket'
 
 class Netruby
 def initialize(server="",port=0)
-	@server = server
-	@port = port
-	@socket = opensocket
+	@socket = TCPSocket.new(server,port)
 	@snipin = Fullcircle::Snip.new
 	@snipout = Fullcircle::Snip.new
-end
-
-def opensocket
-	TCPSocket.new(@server,@port)
-end 
-
-def closesocket
-	@socket.close
 end
 
 def send
@@ -32,32 +22,31 @@ def recv
 	header = @socket.recv(10)
 	if not header =~ /^[ ]{0,}[0-9]{1,}$/
 		puts "ERROR: Header from Server not match"
-		closesocket
 		exit
 	end
 	payload = @socket.recv(header.to_i)
 	@snipin.parse_from_string(payload)
 	case @snipin.type
 		when Fullcircle::Snip::SnipType::PING
-			return ["PING",recv_ping]
+			return {:type=>:PING,recv_ping}
 		when Fullcircle::Snip::SnipType::PONG
-			return ["PONG",recv_pong]
+			return {:type=>:PONG,recv_pong}
 		when Fullcircle::Snip::SnipType::ERROR
-			return ["ERROR",recv_error]
+			return {:type=>:ERROR,recv_error}
 		when Fullcircle::Snip::SnipType::REQUEST
-			return ["REQUEST",recv_request]
+			return {:type=>:REQUEST,recv_request}
 		when Fullcircle::Snip::SnipType::START
-			return ["START",recv_start]
+			return {:type=>:START}
 		when Fullcircle::Snip::SnipType::FRAME
-			return ["FRAME",recv_frame]
+			return {:type=>:FRAME,recv_frame}
 		when Fullcircle::Snip::SnipType::ACK
-			return ["ACK",recv_ack]
+			return {:type=>:ACK}
 		when Fullcircle::Snip::SnipType::NACK
-			return ["NACK",recv_nack]
+			return {:type=>:NACK}
 		when Fullcircle::Snip::SnipType::TIMEOUT
-			return ["TIMEOUT",recv_timeout]
+			return {:type=>:TIMEOUT}
 		when Fullcircle::Snip::SnipType::ABORT
-			return ["ABORT",recv_abort]
+			return {:type=>:ABORT}
 	else
 		puts "Unnown Answer"
 	end	
@@ -79,7 +68,7 @@ def send_ping(count)
 end
 
 def recv_ping
-	return @snipin.ping_snip
+	return @snipin.ping_snip.to_hash
 end
 
 def send_pong(count)
@@ -91,7 +80,7 @@ def send_pong(count)
 end
 
 def recv_pong
-	return @snipin.pong_snip
+	return @snipin.pong_snip.to_hash
 end
 
 def send_error(errortype,description)
@@ -106,7 +95,7 @@ def send_error(errortype,description)
 end
 
 def recv_error
-	return @snipin.error_snip
+	return @snipin.error_snip.to_hash
 end
 
 def send_request(color,seqid,meta)
@@ -120,7 +109,7 @@ def send_request(color,seqid,meta)
 end
 
 def recv_request
-	return @snipin.req_snip
+	return @snipin.req_snip.to_hash
 end
 
 def send_start
@@ -128,10 +117,6 @@ def send_start
 	startsnip = Fullcircle::Snip::StartSnip.new
 	@snipout.start_snip = startsnip
 	send
-end
-
-def recv_start
-	return @snipin.start_snip
 end
 
 def send_frame(frame)
@@ -143,7 +128,7 @@ def send_frame(frame)
 end
 
 def recv_frame 
-	return @snipin.frame_snip
+	return @snipin.frame_snip.to_hash
 end
 
 def send_ack
@@ -153,19 +138,11 @@ def send_ack
 	send
 end
 
-def recv_ack
-	return @snipin.ack_snip
-end
-
 def send_nack                  
         @snipout.type = Fullcircle::Snip::SnipType::NACK
         nacksnip = Fullcircle::Snip::NackSnip.new
         @snipout.nack_snip = nacksnip
         send
-end
-
-def recv_nack          
-        return @snipin.nack_snip
 end
 
 def send_timeout
@@ -175,19 +152,11 @@ def send_timeout
 	send
 end
 
-def recv_timeout
-	return @snipin.timeout_snip
-end
-
 def send_abort
 	@snipout.type = Fullcircle::Snip::SnipType::ABORT
 	abortsnip = Fullcircle::Snip::AbortSnip.new
 	@snipout.abort_snip = abortsnip
 	send
-end
-
-def recv_abort
-	return @snipin.abort_snip
 end
 
 

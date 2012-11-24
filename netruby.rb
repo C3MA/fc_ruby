@@ -4,8 +4,6 @@ require 'rubygems'
 require 'sequence.pb.rb'
 require 'socket'
 
-
-
 class Netruby
 def initialize(server="",port=0)
 	@socket = TCPSocket.new(server,port)
@@ -28,25 +26,25 @@ def recv
 	@snipin.parse_from_string(payload)
 	case @snipin.type
 		when Fullcircle::Snip::SnipType::PING
-			return {:type=>:PING,recv_ping}
+			return {:type => :PING, :payload => recv_ping}
 		when Fullcircle::Snip::SnipType::PONG
-			return {:type=>:PONG,recv_pong}
+			return {:type => :PONG, :payload => recv_pong}
 		when Fullcircle::Snip::SnipType::ERROR
-			return {:type=>:ERROR,recv_error}
+			return {:type => :ERROR, :payload => recv_error}
 		when Fullcircle::Snip::SnipType::REQUEST
-			return {:type=>:REQUEST,recv_request}
+			return {:type => :REQUEST, :payload => recv_request}
 		when Fullcircle::Snip::SnipType::START
-			return {:type=>:START}
+			return {:type => :START}
 		when Fullcircle::Snip::SnipType::FRAME
-			return {:type=>:FRAME,recv_frame}
+			return {:type => :FRAME, :payload => recv_frame}
 		when Fullcircle::Snip::SnipType::ACK
-			return {:type=>:ACK}
+			return {:type => :ACK}
 		when Fullcircle::Snip::SnipType::NACK
-			return {:type=>:NACK}
+			return {:type => :NACK}
 		when Fullcircle::Snip::SnipType::TIMEOUT
-			return {:type=>:TIMEOUT}
+			return {:type => :TIMEOUT}
 		when Fullcircle::Snip::SnipType::ABORT
-			return {:type=>:ABORT}
+			return {:type => :ABORT}
 	else
 		puts "Unnown Answer"
 	end	
@@ -159,5 +157,8 @@ def send_abort
 	send
 end
 
+def get_socket
+	return @socket
+end
 
 end

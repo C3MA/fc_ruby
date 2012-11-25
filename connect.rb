@@ -34,6 +34,7 @@ def send_s(sequenze)
 			@netruby.send_frame(frame)
 		}		
 		threats[1].exit
+		@netruby.close_socket
 	}
         threats[1] = Thread.new() {
 	recv = @netruby.recv
@@ -56,12 +57,12 @@ def server
 	@netruby.send_ack
 	@netruby.send_start
 	recv = @netruby.recv
-	i = 0
 	while (recv[:type]==:FRAME)
-	sequenze.frame << recv[:payload][:frame]
-	recv = @netruby.recv
-	i = i+1
-	puts i
+		sequenze.frame << recv[:payload][:frame]
+		recv = @netruby.recv
+		if recv[:type] == :EOS)
+			break
+		end
 	end
 	return sequenze
 end

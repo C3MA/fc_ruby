@@ -12,7 +12,7 @@
 #   required string generator_version = 5;
 # }
 # 
-# message RGB_Value {
+# message RGBValue {
 #   required uint32 red = 1;
 #   required uint32 green = 2;
 #   required uint32 blue = 3;
@@ -21,7 +21,7 @@
 # }
 # 
 # message BinaryFrame {
-#   repeatedRGB_Value pixel = 1;
+#   repeated RGBValue pixel = 1;
 # }
 # 
 # message BinarySequence {
@@ -44,6 +44,7 @@
 #     NACK = 8;
 #     TIMEOUT = 9;
 #     ABORT = 10;
+#     EOS = 11;
 #   }
 #   required SnipType type = 1;
 # 
@@ -99,10 +100,11 @@
 #   message AbortSnip {
 #   }
 #   optional AbortSnip abort_snip = 20;
+# 
+#   message EosSnip {
+#   }
+#   optional EosSnip eos_snip = 21;
 # }
-# 
-# 
-# 
 
 require 'protobuf/message/message'
 require 'protobuf/message/enum'
@@ -149,6 +151,7 @@ module Fullcircle
       NACK = value(:NACK, 8)
       TIMEOUT = value(:TIMEOUT, 9)
       ABORT = value(:ABORT, 10)
+      EOS = value(:EOS, 11)
     end
     required :SnipType, :type, 1
     class PingSnip < ::Protobuf::Message
@@ -204,5 +207,9 @@ module Fullcircle
       defined_in __FILE__
     end
     optional :AbortSnip, :abort_snip, 20
+    class EosSnip < ::Protobuf::Message
+      defined_in __FILE__
+    end
+    optional :EosSnip, :eos_snip, 21
   end
 end

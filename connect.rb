@@ -1,8 +1,8 @@
 require "netruby.rb"
 
 class Connect
-def initialize(server="",port=0)
-	@netruby = Netruby.new(server,port)
+def initialize(server="",port=0,socket=true)
+	@netruby = Netruby.new(server,port,socket)
 end
 
 def ping(n=10)
@@ -46,4 +46,25 @@ def send_s(sequenze)
 	threats.each { |aThread| aThread.join }
 end
 
+def server 
+	recv = @netruby.recv
+	if recv[:type] != :REQUEST then
+		puts "ERROR: Request required, get: " + recv[:type].to_s
+	end
+	sequenze = Fullcircle::BinarySequence.new
+	sequenze.metadata = recv[:payload][:meta]
+	@netruby.send_ack
+	@netruby.send_start
+	recv = @netruby.recv
+	i = 0
+	while (recv[:type]==:FRAME)
+	sequenze.frame << recv[:payload][:frame]
+	recv = @netruby.recv
+	i = i+1
+	puts i
+	end
+	return sequenze
 end
+
+end
+

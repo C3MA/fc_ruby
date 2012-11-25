@@ -5,10 +5,23 @@ require 'sequence.pb.rb'
 require 'socket'
 
 class Netruby
-def initialize(server="",port=0)
-	@socket = TCPSocket.new(server,port)
+def initialize(server="",port=0,socket=true)
+	if socket == true then
+		@socket = TCPSocket.new(server,port)
+	else
+		@server = TCPServer.new(port)
+		@socket = @server.accept
+	end
 	@snipin = Fullcircle::Snip.new
 	@snipout = Fullcircle::Snip.new
+end
+
+def close_socket
+	@socket.close
+end
+
+def reaccept
+	@socket = @server.accept
 end
 
 def send

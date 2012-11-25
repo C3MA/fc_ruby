@@ -58,6 +58,8 @@ def recv
 			return {:type => :TIMEOUT}
 		when Fullcircle::Snip::SnipType::ABORT
 			return {:type => :ABORT}
+		when Fullcircle::Snip::SnipType::EOS
+			return {:type => :EOS}
 	else
 		puts "Unnown Answer"
 	end	

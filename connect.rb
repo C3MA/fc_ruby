@@ -60,7 +60,7 @@ def server
 	while (recv[:type]==:FRAME)
 		sequenze.frame << recv[:payload][:frame]
 		recv = @netruby.recv
-		if recv[:type] == :EOS)
+		if recv[:type] == :EOS
 			break
 		end
 	end

@@ -3,6 +3,8 @@ require "netruby.rb"
 class Connect
 def initialize(server="",port=0,socket=true)
 	@netruby = Netruby.new(server,port,socket)
+	@timeout = 0
+	@n_abort = 0
 end
 
 def ping(n=10)
@@ -34,7 +36,7 @@ def send_s(sequenze)
 			@netruby.send_frame(frame)
 		}		
 		threats[1].exit
-		@netruby.close_socket
+		@netruby.send_eos
 	}
         threats[1] = Thread.new() {
 	recv = @netruby.recv
@@ -57,15 +59,35 @@ def server
 	@netruby.send_ack
 	@netruby.send_start
 	recv = @netruby.recv
+	time_s = Time.now
+	n = 0
 	while (recv[:type]==:FRAME)
 		sequenze.frame << recv[:payload][:frame]
 		recv = @netruby.recv
+		n = n + 1
 		if recv[:type] == :EOS
+			break
+		end
+		if @timeout > 0 && (Time.now-time_s) >= @timeout then
+			@netruby.send_timeout
+			puts "Timeout! After " + (Time.now-time_s).to_s + " sec"
+			break
+		end
+		if @n_abort > 0 && n >= @n_abort then
+			@netruby.send_abort
+			puts "ABORT! After " + n.to_s + " Tryes"
 			break
 		end
 	end
 	return sequenze
 end
 
+def set_timeout(timeout)
+	@timeout = timeout
 end
 
+def set_abort(n)
+	@n_abort = n
+end
+
+end

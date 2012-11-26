@@ -176,4 +176,11 @@ def get_socket
 	return @socket
 end
 
+def send_eos
+	@snipout.type = Fullcircle::Snip::SnipType::EOS
+	eossnip = Fullcircle::Snip::EosSnip.new
+	@snipout.eos_snip = eossnip
+	send
+end
+
 end

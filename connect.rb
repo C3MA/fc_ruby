@@ -21,20 +21,27 @@ def ping(n=10)
 end
 
 def send_s(sequenze) 
+	fps = sequenze.metadata.frames_per_second
 	@netruby.send_request("test",1,sequenze.metadata)
+	puts 'Send Request, Wait for ACK'
 	recv = @netruby.recv
 	if recv[:type] != :ACK then
 		puts "ERROR: ACK required, get: " + recv[:type].to_s
 	end
+	puts 'Wait for Start'
 	recv = @netruby.recv
 	if recv[:type] != :START then
 		puts "ERROR: START required, get: " + recv[:type].to_s
 	end
 	threats = []
+	now = Time.new
 	threats[0] = Thread.new(sequenze) {|seq|
 		seq.frame.each { |frame|
 			@netruby.send_frame(frame)
-		}		
+			sleep((1.0/fps.to_f)-(Time.new-now))
+			now = Time.new
+			puts "sleep for " + (1.0/fps.to_f).to_s
+		}
 		threats[1].exit
 		@netruby.send_eos
 	}
@@ -47,6 +54,7 @@ def send_s(sequenze)
 	end
 	}
 	threats.each { |aThread| aThread.join }
+	@netruby.close_socket
 end
 
 def server 

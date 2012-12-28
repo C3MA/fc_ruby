@@ -44,7 +44,7 @@
 #     NACK = 8;
 #     TIMEOUT = 9;
 #     ABORT = 10;
-#     EOS = 11;
+# 		EOS = 11;
 #   }
 #   required SnipType type = 1;
 # 
@@ -101,10 +101,13 @@
 #   }
 #   optional AbortSnip abort_snip = 20;
 # 
-#   message EosSnip {
-#   }
-#   optional EosSnip eos_snip = 21;
+# 	message EosSnip {
+# 	}
+# 	optional EosSnip eos_snip = 21;
 # }
+# 
+# 
+# 
 
 require 'protobuf/message/message'
 require 'protobuf/message/enum'
